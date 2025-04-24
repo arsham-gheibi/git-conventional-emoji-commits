@@ -1,0 +1,43 @@
+#!/usr/bin/env python3
+
+import sys
+import re
+
+# File containing the commit message
+msg_file = sys.argv[1]
+
+# Read the current commit message
+with open(msg_file, 'r', encoding='utf-8') as f:
+    msg = f.read()
+
+# Map Conventional Commit types to emojis
+emoji_map = {
+    r'^feat:': '✨',
+    r'^fix:': '🐛',
+    r'^build:': '📦',
+    r'^chore:': '🔧',
+    r'^docs:': '📝',
+    r'^style:': '💄',
+    r'^refactor:': '♻️',
+    r'^test:': '✅',
+    r'^perf:': '⚡️',
+    r'^ci:': '👷',
+    r'^revert:': '⏪',
+}
+
+def get_emoji(msg):
+    for pattern, emoji in emoji_map.items():
+        if re.match(pattern, msg, re.IGNORECASE):
+            return emoji
+    return ''
+
+lines = msg.splitlines()
+if lines:
+    emoji = get_emoji(lines[0])
+    if emoji and not lines[0].startswith(emoji):
+        lines[0] = f'{emoji} {lines[0]}'
+        # Write back the modified message
+        with open(msg_file, 'w', encoding='utf-8') as f:
+            f.write('\n'.join(lines))
+
+# No emoji added if commit type doesn't match
